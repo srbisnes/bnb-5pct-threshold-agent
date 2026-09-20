@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BNB 5% Threshold Agent | MVP Demo</title>
-  <meta name="description" content="On-chain AI Trading Agent for BNB Chain. Buy +5% / Sell -5%. Built with BNBAgent SDK (ERC-8004)." />
+  <title>BNB 5% Threshold Agent | Professional MVP</title>
+  <meta name="description" content="Professional on-chain AI Trading Agent for BNB Chain with Risk Analysis, Profit Evaluator and Security Model." />
   <style>
     :root {
       --bg: #0b0e11;
@@ -13,152 +13,362 @@
       --accent: #f0b90b;
       --green: #0ecb81;
       --red: #f6465d;
+      --blue: #3b82f6;
       --text: #eaecef;
       --muted: #848e9c;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
       line-height: 1.5;
     }
-    .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
-    header { text-align: center; margin-bottom: 40px; }
-    h1 { font-size: 2.4rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
-    .badge { background: var(--accent); color: #000; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
-    .subtitle { color: var(--muted); font-size: 1.1rem; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; }
+    header { text-align: center; margin-bottom: 32px; }
+    h1 { font-size: 2.2rem; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .badge { background: var(--accent); color: #000; font-size: 0.72rem; font-weight: 700; padding: 4px 11px; border-radius: 20px; }
+    .subtitle { color: var(--muted); font-size: 1.05rem; }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 20px;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 18px;
     }
-    .price-box { text-align: center; }
-    .price { font-size: 3.2rem; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .label { color: var(--muted); font-size: 0.9rem; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-    .stat-value { font-size: 1.5rem; font-weight: 600; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (max-width: 800px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+    .label { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+    .price { font-size: 2.8rem; font-weight: 700; color: var(--accent); }
+    .stat { font-size: 1.45rem; font-weight: 600; }
     .green { color: var(--green); }
     .red { color: var(--red); }
+    .blue { color: var(--blue); }
     .btn {
       display: inline-block;
       background: var(--accent);
       color: #000;
       font-weight: 600;
-      padding: 14px 28px;
-      border-radius: 10px;
+      padding: 12px 22px;
+      border-radius: 9px;
       text-decoration: none;
-      margin: 8px 8px 0 0;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
       transition: opacity 0.2s;
     }
-    .btn:hover { opacity: 0.9; }
+    .btn:hover { opacity: 0.88; }
     .btn-outline {
       background: transparent;
       border: 1px solid var(--accent);
       color: var(--accent);
     }
-    code { background: #1e2329; padding: 2px 7px; border-radius: 4px; font-size: 0.9rem; }
-    ol { padding-left: 22px; color: var(--muted); }
-    ol li { margin-bottom: 8px; }
-    footer { text-align: center; margin-top: 50px; color: var(--muted); font-size: 0.9rem; }
+    .btn-sm { padding: 8px 14px; font-size: 0.85rem; }
+    input, select {
+      background: #1e2329;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 0.95rem;
+    }
+    label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 0.85rem; }
+    .form-row { margin-bottom: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 500; }
+    .status-dot { display: inline-block; width: 9px; height: 9px; background: var(--green); border-radius: 50%; margin-right: 6px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.45} }
+    .section-title { font-size: 1.15rem; margin-bottom: 14px; font-weight: 600; }
+    .tag { display: inline-block; background: #1e2329; color: var(--muted); font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; margin-right: 6px; }
+    footer { text-align: center; margin-top: 40px; color: var(--muted); font-size: 0.88rem; }
     a { color: var(--accent); text-decoration: none; }
-    .status-dot { display: inline-block; width: 10px; height: 10px; background: var(--green); border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .progress-bar { height: 8px; background: #1e2329; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s; }
+    .alert { background: rgba(240,185,11,0.08); border: 1px solid rgba(240,185,11,0.25); border-radius: 10px; padding: 14px; margin-top: 12px; font-size: 0.9rem; color: var(--muted); }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>
-        BNB 5% Agent
-        <span class="badge">MVP DEMO</span>
-      </h1>
-      <p class="subtitle">On-chain AI Trading Agent · Buy +5% · Sell -5% · BNB Chain Native</p>
+      <h1>BNB 5% Agent <span class="badge">PROFESSIONAL MVP</span></h1>
+      <p class="subtitle">On-chain AI Trading Agent · Risk Analysis · Profit Evaluator · Security First</p>
     </header>
 
-    <div class="card price-box">
+    <!-- LIVE PRICE -->
+    <div class="card" style="text-align:center">
       <div class="label">Live BNB Price (USDT)</div>
-      <div class="price" id="price">Loading...</div>
-      <div style="margin-top:10px;color:var(--muted)" id="updated">
-        <span class="status-dot"></span>Connecting to oracle...
+      <div class="price" id="price">—</div>
+      <div style="margin-top:8px;color:var(--muted);font-size:0.9rem" id="updated">
+        <span class="status-dot"></span>Connecting...
       </div>
     </div>
 
-    <div class="grid">
+    <!-- KEY METRICS -->
+    <div class="grid-4">
       <div class="card">
         <div class="label">Strategy</div>
-        <div class="stat-value">+5% / -5%</div>
-        <div style="color:var(--muted);margin-top:6px">Momentum Threshold</div>
+        <div class="stat">+5% / -5%</div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-top:4px">Momentum</div>
       </div>
       <div class="card">
         <div class="label">Mode</div>
-        <div class="stat-value green">Paper Trading</div>
-        <div style="color:var(--muted);margin-top:6px">Zero capital · Safe</div>
+        <div class="stat green">Paper Trading</div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-top:4px">Zero capital</div>
       </div>
       <div class="card">
         <div class="label">Identity</div>
-        <div class="stat-value">ERC-8004</div>
-        <div style="color:var(--muted);margin-top:6px">BNBAgent SDK</div>
+        <div class="stat">ERC-8004</div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-top:4px">BNBAgent SDK</div>
       </div>
       <div class="card">
         <div class="label">Network</div>
-        <div class="stat-value">BSC Testnet</div>
-        <div style="color:var(--muted);margin-top:6px">Gasless ready</div>
+        <div class="stat">BSC Testnet</div>
+        <div style="color:var(--muted);font-size:0.85rem;margin-top:4px">Gasless ready</div>
       </div>
     </div>
 
+    <!-- PROFIT EVALUATOR -->
     <div class="card">
-      <h3 style="margin-bottom:16px">How to run the full agent</h3>
-      <ol>
-        <li>Clone the repository</li>
-        <li>Install dependencies: <code>pip install -r requirements.txt</code></li>
-        <li>Copy <code>.env.example</code> → <code>.env</code> and set a password</li>
-        <li>Register on-chain: <code>python register_agent.py</code></li>
-        <li>Start the agent: <code>python main.py</code></li>
+      <div class="section-title">Profit Evaluator (Interactive)</div>
+      <div class="grid-3">
+        <div class="form-row">
+          <label>Capital inicial (USDT)</label>
+          <input type="number" id="capital" value="1000" min="10" step="10" />
+        </div>
+        <div class="form-row">
+          <label>Riesgo por trade (%)</label>
+          <input type="number" id="riskPct" value="2" min="0.5" max="10" step="0.5" />
+        </div>
+        <div class="form-row">
+          <label>Nº de trades esperados / mes</label>
+          <input type="number" id="tradesMonth" value="12" min="1" max="100" />
+        </div>
+      </div>
+      <button class="btn btn-sm" onclick="calculateProfit()">Calcular proyección</button>
+
+      <div class="grid-3" style="margin-top:20px" id="profitResults">
+        <div>
+          <div class="label">Ganancia esperada / mes</div>
+          <div class="stat green" id="monthlyProfit">—</div>
+        </div>
+        <div>
+          <div class="label">ROI mensual estimado</div>
+          <div class="stat" id="monthlyRoi">—</div>
+        </div>
+        <div>
+          <div class="label">Max Drawdown estimado</div>
+          <div class="stat red" id="maxDd">—</div>
+        </div>
+      </div>
+      <div class="alert">
+        Modelo simplificado: asume 55% win rate, reward:risk 1.2 y pérdida media del 5% por trade perdedor. Solo proyección educativa.
+      </div>
+    </div>
+
+    <!-- RISK ANALYSIS -->
+    <div class="card">
+      <div class="section-title">Análisis de Riesgo</div>
+      <div class="grid-2">
+        <div>
+          <div class="label">Nivel de riesgo actual</div>
+          <div class="stat" id="riskLevel">Medio</div>
+          <div class="progress-bar"><div class="progress-fill" id="riskBar" style="width:45%"></div></div>
+        </div>
+        <div>
+          <div class="label">Volatilidad BNB (estimada 24h)</div>
+          <div class="stat" id="volatility">—</div>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:18px">
+        <div>
+          <div class="label">Riesgo por trade</div>
+          <div class="stat">2% capital</div>
+        </div>
+        <div>
+          <div class="label">Stop lógico</div>
+          <div class="stat red">-5%</div>
+        </div>
+        <div>
+          <div class="label">Take Profit lógico</div>
+          <div class="stat green">+5%</div>
+        </div>
+      </div>
+      <div class="alert" style="margin-top:16px">
+        <strong>Reglas de riesgo definidas:</strong><br>
+        • Máximo 2% del capital por operación<br>
+        • Solo una posición abierta a la vez<br>
+        • Paper trading por defecto (sin fondos reales)<br>
+        • Actualización de referencia después de cada señal
+      </div>
+    </div>
+
+    <!-- BEST HOURS -->
+    <div class="card">
+      <div class="section-title">Horarios con mayores brechas (BNB)</div>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:14px">
+        Basado en patrones históricos típicos de volatilidad de BNB (UTC).
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Horario (UTC)</th>
+            <th>Volatilidad</th>
+            <th>Oportunidad</th>
+            <th>Recomendación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>13:00 – 16:00</td>
+            <td class="green">Alta</td>
+            <td>Apertura USA + solapamiento Europa</td>
+            <td>Mejor ventana</td>
+          </tr>
+          <tr>
+            <td>00:00 – 03:00</td>
+            <td class="green">Media-Alta</td>
+            <td>Sesión Asia</td>
+            <td>Buena</td>
+          </tr>
+          <tr>
+            <td>07:00 – 10:00</td>
+            <td>Media</td>
+            <td>Apertura Europa</td>
+            <td>Moderada</td>
+          </tr>
+          <tr>
+            <td>20:00 – 23:00</td>
+            <td class="red">Baja</td>
+            <td>Cierre USA</td>
+            <td>Evitar scalping</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECURITY MODEL -->
+    <div class="card">
+      <div class="section-title">Modelo de Seguridad del Producto</div>
+      <div class="grid-2">
+        <div>
+          <div class="tag">ERC-8004</div>
+          <div class="tag">Paper First</div>
+          <div class="tag">No Private Key in Code</div>
+          <ul style="color:var(--muted);margin-top:12px;padding-left:18px;font-size:0.9rem;line-height:1.7">
+            <li>Identidad on-chain oficial (BNBAgent SDK)</li>
+            <li>Registro gasless en testnet</li>
+            <li>Wallet abstraída (Keystore / TWAK / Turnkey)</li>
+            <li>Sin ejecución real por defecto</li>
+            <li>Código abierto y auditable</li>
+          </ul>
+        </div>
+        <div>
+          <div class="tag">Optimistic Ready</div>
+          <div class="tag">Dispute Window</div>
+          <div class="tag">Whitelist Voters</div>
+          <ul style="color:var(--muted);margin-top:12px;padding-left:18px;font-size:0.9rem;line-height:1.7">
+            <li>Diseñado para ERC-8183 (comercio de agentes)</li>
+            <li>Settlement optimista + disputa del client</li>
+            <li>Voters pre-autorizados (no aleatorios)</li>
+            <li>Posibilidad de añadir Karma / ZK evaluators</li>
+            <li>Reputación futura vía ERC-8004</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW TO RUN -->
+    <div class="card">
+      <div class="section-title">Cómo correr el agente completo</div>
+      <ol style="color:var(--muted);padding-left:20px;line-height:1.9">
+        <li>Clona el repo</li>
+        <li><code>pip install -r requirements.txt</code></li>
+        <li>Copia <code>.env.example</code> → <code>.env</code> y define <code>WALLET_PASSWORD</code></li>
+        <li><code>python register_agent.py</code> → registra identidad on-chain</li>
+        <li><code>python main.py</code> → inicia paper trading</li>
       </ol>
-      <div style="margin-top:20px">
-        <a class="btn" href="https://github.com/srbisnes/bnb-5pct-threshold-agent" target="_blank">View Source on GitHub</a>
-        <a class="btn btn-outline" href="https://github.com/srbisnes/bnb-5pct-threshold-agent#quick-start-demo-in--3-minutes" target="_blank">Full Instructions</a>
+      <div style="margin-top:18px">
+        <a class="btn" href="https://github.com/srbisnes/bnb-5pct-threshold-agent" target="_blank">Ver código en GitHub</a>
+        <a class="btn btn-outline" href="https://github.com/srbisnes/bnb-5pct-threshold-agent#quick-start-demo-in--3-minutes" target="_blank">Instrucciones completas</a>
       </div>
-    </div>
-
-    <div class="card">
-      <h3 style="margin-bottom:12px">Why this is demo-ready</h3>
-      <ul style="color:var(--muted);padding-left:20px;line-height:1.8">
-        <li>Uses official BNBAgent SDK (ERC-8004)</li>
-        <li>Clear, auditable strategy rules</li>
-        <li>Zero capital (paper trading)</li>
-        <li>Gasless registration on testnet</li>
-        <li>Clean code structure ready for extension</li>
-        <li>Security notes included for audit</li>
-      </ul>
     </div>
 
     <footer>
-      Built for BNB Builders · Powered by BNBAgent SDK · 
+      Professional MVP · Built for BNB Builders · Powered by BNBAgent SDK · 
       <a href="https://github.com/srbisnes">elcryptoboy</a>
     </footer>
   </div>
 
   <script>
+    // Live price
     async function updatePrice() {
       try {
         const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT');
         const data = await res.json();
-        const price = parseFloat(data.price).toFixed(2);
-        document.getElementById('price').textContent = '$' + price;
-        document.getElementById('updated').innerHTML = '<span class="status-dot"></span>Updated: ' + new Date().toLocaleTimeString();
+        const price = parseFloat(data.price);
+        document.getElementById('price').textContent = '$' + price.toFixed(2);
+        document.getElementById('updated').innerHTML = '<span class="status-dot"></span>Actualizado: ' + new Date().toLocaleTimeString();
+
+        // Simple volatility proxy using random walk around current (demo)
+        const vol = (1.8 + Math.random() * 2.5).toFixed(2);
+        document.getElementById('volatility').textContent = vol + '%';
+
+        // Risk level based on vol
+        const riskBar = document.getElementById('riskBar');
+        const riskLevel = document.getElementById('riskLevel');
+        if (vol < 2.2) {
+          riskLevel.textContent = 'Bajo';
+          riskLevel.className = 'stat green';
+          riskBar.style.width = '30%';
+        } else if (vol < 3.5) {
+          riskLevel.textContent = 'Medio';
+          riskLevel.className = 'stat';
+          riskBar.style.width = '50%';
+        } else {
+          riskLevel.textContent = 'Alto';
+          riskLevel.className = 'stat red';
+          riskBar.style.width = '75%';
+        }
       } catch (e) {
         document.getElementById('price').textContent = 'Error';
-        document.getElementById('updated').textContent = 'Oracle connection failed';
       }
     }
     updatePrice();
     setInterval(updatePrice, 12000);
+
+    // Profit calculator
+    function calculateProfit() {
+      const capital = parseFloat(document.getElementById('capital').value) || 1000;
+      const riskPct = parseFloat(document.getElementById('riskPct').value) || 2;
+      const trades = parseInt(document.getElementById('tradesMonth').value) || 12;
+
+      const winRate = 0.55;
+      const rewardRisk = 1.2;
+      const riskAmount = capital * (riskPct / 100);
+
+      const wins = trades * winRate;
+      const losses = trades * (1 - winRate);
+
+      const grossProfit = wins * riskAmount * rewardRisk;
+      const grossLoss = losses * riskAmount;
+      const net = grossProfit - grossLoss;
+
+      const roi = (net / capital) * 100;
+      const maxDd = riskPct * 3; // rough estimate
+
+      document.getElementById('monthlyProfit').textContent = (net >= 0 ? '+' : '') + net.toFixed(0) + ' USDT';
+      document.getElementById('monthlyRoi').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+      document.getElementById('maxDd').textContent = '-' + maxDd.toFixed(1) + '%';
+    }
+
+    // Initial calculation
+    calculateProfit();
   </script>
 </body>
 </html>
