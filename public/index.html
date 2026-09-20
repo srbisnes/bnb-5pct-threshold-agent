@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BNB 5% Threshold Agent</title>
+  <title>BNB 5% Threshold Agent | MVP Demo</title>
+  <meta name="description" content="On-chain AI Trading Agent for BNB Chain. Buy +5% / Sell -5%. Built with BNBAgent SDK (ERC-8004)." />
   <style>
     :root {
       --bg: #0b0e11;
       --card: #141a21;
+      --border: #1e2329;
       --accent: #f0b90b;
       --green: #0ecb81;
       --red: #f6465d;
@@ -16,107 +18,129 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
+      line-height: 1.5;
     }
-    .container { max-width: 720px; width: 100%; }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .badge {
-      background: var(--accent);
-      color: #000;
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-    .subtitle { color: var(--muted); margin-bottom: 32px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+    header { text-align: center; margin-bottom: 40px; }
+    h1 { font-size: 2.4rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .badge { background: var(--accent); color: #000; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+    .subtitle { color: var(--muted); font-size: 1.1rem; }
     .card {
       background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 24px;
       margin-bottom: 20px;
-      border: 1px solid #1e2329;
     }
-    .price {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    .label { color: var(--muted); font-size: 0.9rem; margin-bottom: 4px; }
+    .price-box { text-align: center; }
+    .price { font-size: 3.2rem; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
+    .label { color: var(--muted); font-size: 0.9rem; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    .stat-value { font-size: 1.5rem; font-weight: 600; }
+    .green { color: var(--green); }
+    .red { color: var(--red); }
     .btn {
       display: inline-block;
       background: var(--accent);
       color: #000;
       font-weight: 600;
-      padding: 12px 24px;
-      border-radius: 8px;
+      padding: 14px 28px;
+      border-radius: 10px;
       text-decoration: none;
-      margin-top: 12px;
+      margin: 8px 8px 0 0;
+      transition: opacity 0.2s;
     }
     .btn:hover { opacity: 0.9; }
-    code {
-      background: #1e2329;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.9rem;
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
     }
-    footer { margin-top: 40px; color: var(--muted); font-size: 0.85rem; }
-    a { color: var(--accent); }
+    code { background: #1e2329; padding: 2px 7px; border-radius: 4px; font-size: 0.9rem; }
+    ol { padding-left: 22px; color: var(--muted); }
+    ol li { margin-bottom: 8px; }
+    footer { text-align: center; margin-top: 50px; color: var(--muted); font-size: 0.9rem; }
+    a { color: var(--accent); text-decoration: none; }
+    .status-dot { display: inline-block; width: 10px; height: 10px; background: var(--green); border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>
-      BNB 5% Agent
-      <span class="badge">BNB CHAIN</span>
-    </h1>
-    <p class="subtitle">Momentum Agent · Compra +5% · Vende -5% · Paper Trading</p>
+    <header>
+      <h1>
+        BNB 5% Agent
+        <span class="badge">MVP DEMO</span>
+      </h1>
+      <p class="subtitle">On-chain AI Trading Agent · Buy +5% · Sell -5% · BNB Chain Native</p>
+    </header>
 
-    <div class="card">
-      <div class="label">Precio actual de BNB</div>
-      <div class="price" id="price">Cargando...</div>
-      <div style="margin-top:12px;color:var(--muted)" id="updated"></div>
+    <div class="card price-box">
+      <div class="label">Live BNB Price (USDT)</div>
+      <div class="price" id="price">Loading...</div>
+      <div style="margin-top:10px;color:var(--muted)" id="updated">
+        <span class="status-dot"></span>Connecting to oracle...
+      </div>
     </div>
 
     <div class="grid">
       <div class="card">
-        <div class="label">Estrategia</div>
-        <div style="font-size:1.3rem;font-weight:600">+5% / -5%</div>
-        <div style="color:var(--muted);margin-top:6px">Threshold fijo</div>
+        <div class="label">Strategy</div>
+        <div class="stat-value">+5% / -5%</div>
+        <div style="color:var(--muted);margin-top:6px">Momentum Threshold</div>
       </div>
       <div class="card">
-        <div class="label">Modo</div>
-        <div style="font-size:1.3rem;font-weight:600;color:var(--green)">Paper Trading</div>
-        <div style="color:var(--muted);margin-top:6px">Zero capital</div>
+        <div class="label">Mode</div>
+        <div class="stat-value green">Paper Trading</div>
+        <div style="color:var(--muted);margin-top:6px">Zero capital · Safe</div>
+      </div>
+      <div class="card">
+        <div class="label">Identity</div>
+        <div class="stat-value">ERC-8004</div>
+        <div style="color:var(--muted);margin-top:6px">BNBAgent SDK</div>
+      </div>
+      <div class="card">
+        <div class="label">Network</div>
+        <div class="stat-value">BSC Testnet</div>
+        <div style="color:var(--muted);margin-top:6px">Gasless ready</div>
       </div>
     </div>
 
     <div class="card">
-      <h3 style="margin-bottom:12px">Cómo usarlo</h3>
-      <ol style="line-height:1.8;padding-left:20px;color:var(--muted)">
-        <li>Clona el repositorio</li>
-        <li>Configura el archivo <code>.env</code></li>
-        <li>Ejecuta <code>python register_agent.py</code> (registro gasless)</li>
-        <li>Corre <code>python main.py</code></li>
+      <h3 style="margin-bottom:16px">How to run the full agent</h3>
+      <ol>
+        <li>Clone the repository</li>
+        <li>Install dependencies: <code>pip install -r requirements.txt</code></li>
+        <li>Copy <code>.env.example</code> → <code>.env</code> and set a password</li>
+        <li>Register on-chain: <code>python register_agent.py</code></li>
+        <li>Start the agent: <code>python main.py</code></li>
       </ol>
-      <a class="btn" href="https://github.com/srbisnes/bnb-5pct-threshold-agent" target="_blank">Ver en GitHub →</a>
+      <div style="margin-top:20px">
+        <a class="btn" href="https://github.com/srbisnes/bnb-5pct-threshold-agent" target="_blank">View Source on GitHub</a>
+        <a class="btn btn-outline" href="https://github.com/srbisnes/bnb-5pct-threshold-agent#quick-start-demo-in--3-minutes" target="_blank">Full Instructions</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px">Why this is demo-ready</h3>
+      <ul style="color:var(--muted);padding-left:20px;line-height:1.8">
+        <li>Uses official BNBAgent SDK (ERC-8004)</li>
+        <li>Clear, auditable strategy rules</li>
+        <li>Zero capital (paper trading)</li>
+        <li>Gasless registration on testnet</li>
+        <li>Clean code structure ready for extension</li>
+        <li>Security notes included for audit</li>
+      </ul>
     </div>
 
     <footer>
-      Hecho por <a href="https://github.com/srbisnes">elcryptoboy</a> · Powered by BNBAgent SDK
+      Built for BNB Builders · Powered by BNBAgent SDK · 
+      <a href="https://github.com/srbisnes">elcryptoboy</a>
     </footer>
   </div>
 
@@ -125,14 +149,16 @@
       try {
         const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT');
         const data = await res.json();
-        document.getElementById('price').textContent = '$' + parseFloat(data.price).toFixed(2);
-        document.getElementById('updated').textContent = 'Actualizado: ' + new Date().toLocaleTimeString();
+        const price = parseFloat(data.price).toFixed(2);
+        document.getElementById('price').textContent = '$' + price;
+        document.getElementById('updated').innerHTML = '<span class="status-dot"></span>Updated: ' + new Date().toLocaleTimeString();
       } catch (e) {
         document.getElementById('price').textContent = 'Error';
+        document.getElementById('updated').textContent = 'Oracle connection failed';
       }
     }
     updatePrice();
-    setInterval(updatePrice, 15000);
+    setInterval(updatePrice, 12000);
   </script>
 </body>
 </html>
